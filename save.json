@@ -1,0 +1,20 @@
+{
+    "defeatedEnemies": [
+        "Dragon"
+    ],
+    "hp": 12,
+    "inventory": [
+        {
+            "name": "potion",
+            "quantity": 3
+        },
+        {
+            "name": "torch",
+            "quantity": 1
+        }
+    ],
+    "level": 1,
+    "mp": 10,
+    "name": "Rob",
+    "xpNeeded": 80
+}

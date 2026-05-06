@@ -1,0 +1,11 @@
+===ROOMS===
+Entrance
+Dark Corridor
+Treasure Room
+Boss Chamber
+===ENEMIES===
+Rat,10,1
+Goblin,20,1
+Troll,40,2
+Dragon,100,3
+===END===

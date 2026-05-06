@@ -1,0 +1,297 @@
+/*
+this is my first game
+13/04/2026
+*/
+
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+
+
+namespace Player {
+	std::string name;
+	void calculateStats (int level, int& maxHp, int& maxMp, float& attack, float& defense) {
+		maxHp = level * 25;
+		maxMp = level * 10;
+		attack = level * 2.5f;
+		defense = level * 2.0f;
+	}
+
+	void checkHP(int hp, int maxHp) {
+		int alert = maxHp * 0.2;
+		if (hp <= alert) {
+			std::cout << "HP LOW!!!" << std::endl;
+		}
+	}
+
+	void viewCharacter(std::string name, int hp, int maxHp, int mp, int maxMp, float attack, float critical, int gold, int level, int xpNeeded ) {
+		std::cout << "=== CHARACTER ===" << std::endl << std::endl;
+		std::cout << std::left << std::setw(15) << "Name: " << name << std::endl;
+		std::cout << std::left << std::setw(15) << "HP: " << hp << " / " << maxHp <<std::endl;
+		std::cout << std::left << std::setw(15) << "MP: " << mp << " / " << maxMp <<std::endl;
+		std::cout << std::left << std::setw(15) << "Attack: "  << attack << std::endl;
+		std::cout << std::left << std::setw(15) << "Critical: " <<  critical << std::endl;
+		std::cout << std::left << std::setw(15) << "Gold: "  << gold << std::endl;
+		std::cout << std::left << std::setw(15) << "Level: " << level << std::endl;
+		std::cout << "XP for next level: " << xpNeeded << std::endl << std::endl;
+	}
+
+	namespace Weapon {
+		int equipWeapon() {
+			int weapon;
+			std::cout << "1 - Sword" << std::endl;
+			std::cout << "2 - Staff" << std::endl;
+			std::cout << "3 - Bow" << std::endl << std::endl;
+			std::cout << "Select your weapon: (number)" << std::endl;
+			std::cin >> weapon;
+			std::cout << "You selected the " << weapon << "."  << std::endl << std::endl;
+			return weapon;
+		}
+		void addWeapon(int weapon, float& bonusDamage, std::string& weaponEffect) {
+			switch (weapon) {
+				case 1:
+					bonusDamage = 3;
+					weaponEffect = "*slashhh*";
+					break;
+				case 2:
+					bonusDamage = 1.5;
+					weaponEffect = "*bonkk*";
+					break;
+				case 3:
+					bonusDamage = 2;
+					weaponEffect = "*sproinggg*";
+					break;
+				default:
+					bonusDamage = 0.5;
+					weaponEffect ="*smackkk*";
+					std::cout << "You did not select a weapon." << std::endl << std::endl;
+					break;
+			}
+			std::cout << "Your weapon has +" << bonusDamage << " attack." << std::endl;
+		}
+
+	}
+}
+
+
+float calculateDamage (float attack, float enemyDefense, int weapon, int weakTo, int bonusDamage) {
+	int critRoll = rand() % 100 + 1;
+	int damage = 0;
+	float criticalHit = attack * 1.5f;
+	if (critRoll > 80) {
+		damage =  criticalHit;
+		std::cout << "Critical Hit!" << std::endl;
+	} else
+	if (critRoll > 30) {
+		if (attack > enemyDefense) {
+			damage = attack - enemyDefense;
+		} else {
+			damage =  1;
+		}
+	} else {
+		damage = attack * 0.5;
+		std::cout << "Grazed..." <<std::endl;
+	}
+
+	if (weakTo == weapon) {
+		std::cout << "Enemy is weak against your weapon!" << std::endl;
+		damage = damage + bonusDamage * 0.3;
+	} else {
+		damage = damage + bonusDamage;
+	}
+	return damage;
+}
+
+// INVENTORY
+
+void viewInventory () {
+	std::cout << std::endl << " === INVENTORY === " << std::endl;
+	for (int slots = 0; slots < 10; slots++) {
+		std::cout << "Slot " << (slots + 1) << ": [empty]" << std::endl << std::endl;
+	}
+	std::cout << std::endl;
+}
+
+// SKILLS
+
+void viewSkills() {
+	std::cout << std::endl << " === SKILLS === " << std::endl << std::endl;
+	for (int x = 0; x < 3; x++) {
+		for (int y = 0; y < 3; y++) {
+			std::cout << "[Skill]";
+		}
+	std::cout << std::endl;
+	}
+}
+
+void viewBattleStats(std::string name, int hp, int maxHp) {
+	std::cout << name << " " << hp << " / " << maxHp << "." << std::endl;
+}
+
+void viewBattleStats(std::string enemy, int enemyHp, int enemyMaxHp, int weakTo) {
+	std::cout << enemy << " " << enemyHp << " / " << enemyMaxHp << "." << std::endl;
+}
+
+
+
+int main () {
+	int level = 1; // assign 1 to int var level
+	int hp = 15;
+	int maxHp;
+	int mp = 20;
+	int maxMp;
+	int gold = 10;
+	float attack = 2.5f; // assign 5.5 to float var attack (signalled by f)
+	float defense = 2.0f;
+	float critical = 1.2f;
+	bool alive = true; // assign true to bool var alive
+	int xpNeeded = level * 100;
+	int potions = 2;
+
+	Player::calculateStats(level, maxHp, maxMp, attack, defense);
+	// ====== ENEMY =====
+
+	std::string enemy = "Enemy";
+	int enemyHp = 20;
+	int enemyMaxHp = 20;
+	float enemyAttack = 3.0;
+	float enemyDefense = 2.5f;
+	int weakTo = 1;
+	int enemyXp = 5;
+
+	std::cout << "Enter your name: "; // display string
+	std::cin >> Player::name; // input value into string var name
+
+	int weapon;
+	std::string weaponEffect;
+	float bonusDamage;
+
+	float damage;
+
+	gold = gold - 3;
+
+	std::cout << "=== ACTION ===" << std::endl << std::endl;
+	std::cout << "You see " << enemy << std::endl << std::endl;
+
+	int round = 0;
+	bool fled = false;
+	bool isStunned = false;
+	bool battleActive = false;
+	int choice = 0;
+
+
+	while (!battleActive) {
+
+		std::cout << "=== CHOOSE AN OPTION ===" << std::endl << std::endl;
+		std::cout << "1. View Character" << std::endl;
+		std::cout << "2. View Inventory" << std::endl;
+		std::cout << "3. Equip Weapon" << std::endl;
+		std::cout << "4. Start Battle" << std::endl;
+
+		if (!choice) std::cin >> choice;
+
+		switch (choice) {
+			case 1:
+				Player::viewCharacter(Player::name, hp, maxHp, mp, maxMp, attack, critical, gold, level, xpNeeded);
+				choice = 0;
+				break;
+			case 2:
+				viewInventory();
+				choice = 0;
+				break;
+			case 3:
+				weapon = Player::Weapon::equipWeapon();
+				Player::Weapon::addWeapon(weapon, bonusDamage, weaponEffect);
+				choice = 0;
+				break;
+			case 4:
+				battleActive = true;
+				choice = 0;
+				break;
+		}
+	}
+
+	while (battleActive) {
+		round++;
+		std::cout << "Round " << round << " begins!" << std::endl;
+		if (isStunned) {
+			std::cout << "Stunned! Turn Skipped." << std::endl;
+			isStunned = false;
+			continue;
+		}
+
+		Player::checkHP(hp, maxHp);
+
+		std::cout << "CHOOSE ACTION:" << std::endl << std::endl;
+		std::cout << "1. Attack" << std::endl;
+		std::cout << "2. Use Potion" << std::endl;
+		std::cout << "3. Flee" << std::endl;
+		std::cin >> choice;
+
+
+		switch (choice) {
+			case 1 :
+				std::cout << std::endl << "=== BATTLE ===" << std::endl;
+				std::cout << Player::name << " attacks " << enemy << "!" << std::endl;
+				damage = calculateDamage(attack, enemyDefense, weapon, weakTo, bonusDamage);
+				std::cout << weaponEffect <<std::endl;
+				std::cout << "Damage dealt: " << damage << std::endl;
+				enemyHp = enemyHp - damage;
+
+				if (enemyHp <= 0) {
+					std::cout << enemy << " defeated!" << std::endl;
+
+					std::cout << "You earn " << enemyXp << " xp" << std::endl;
+					xpNeeded = xpNeeded - enemyXp;
+					std::cout << "XP to next level: " << xpNeeded << std::endl;
+					battleActive = false;
+					break;
+				}
+				viewBattleStats(enemy, enemyHp, enemyMaxHp, weakTo);
+				break;
+			case 2:
+				if  (potions > 0) {
+					std::cout << "You used a potion" << std::endl;
+					potions = potions - 1;
+					std::cout << "You have " << potions << " left" << std::endl;
+					hp = hp + 20;
+					if (hp > maxHp) hp = maxHp;
+						std::cout << "HP restored! " << hp << " / " << maxHp  << std::endl;
+				} else {
+					std::cout << std::endl << "You have no potions left" << std::endl;
+					round--;
+					continue;
+				}
+				break;
+			case 3:
+				fled = true;
+				std::cout << Player::name << " flees the battle!" << std::endl;
+				battleActive = false;
+				break;
+		}
+
+		if (!fled && enemyHp > 0) {
+			std::cout << enemy << " attacks " << Player::name << std::endl;
+
+			if (enemyAttack < defense) {
+			damage = 1;
+			} else {
+				damage = enemyAttack - defense;
+			}
+			std::cout << "smack!" << std::endl;
+			hp = hp - damage;
+
+			if (hp <= 0) {
+				std::cout << Player::name << " has 0 HP left." <<std::endl;
+				std::cout << Player::name << " was defeated." << std::endl;
+				battleActive = false;
+				break;
+			} else {
+				viewBattleStats(Player::name, hp, maxHp);
+
+			}
+		}
+	}
+	return 0;
+}

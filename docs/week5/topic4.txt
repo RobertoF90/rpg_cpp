@@ -1,0 +1,37 @@
+Topic 4: Dynamic Memory
+
+1. Core Concept
+
+Regular variables use stack memory. The compiler decides where they go when you compile.
+
+Dynamic memory uses heap. You request memory while the program runs using the keyword new. You must free it with delete.
+
+Use this when you do not know how much memory you need until the program is actually running.
+
+2. How to Apply
+
+To allocate a single variable: write new int and assign it to a pointer. Then use the pointer with asterisk to assign a value.
+
+To allocate and initialize in one step: write new int(50).
+
+To allocate an array: write new string[5].
+
+To free a single variable: write delete pointerName.
+
+To free an array: write delete[] arrayName.
+
+After deleting, set the pointer to nullptr to avoid bugs.
+
+3. Generic Examples
+
+Create a dynamic enemy health variable. Allocate with new int and value 100. Decrease with subtraction. Delete after use.
+
+Create a dynamic inventory array. Allocate with new string and size 10. Fill with items. Delete array after use.
+
+4. Your Task
+
+Add dynamic memory to your game. Create a dynamic weapon pointer using new string and give it a name like Excalibur. Print the weapon name using the pointer. Delete the pointer after use and set it to nullptr.
+
+Or create a dynamic loot array using new string with a size. Add items. Delete after use.
+
+Choose one example and add it to your rpg.cpp file.

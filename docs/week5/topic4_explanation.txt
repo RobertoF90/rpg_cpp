@@ -1,0 +1,20 @@
+Week 5 Topic 4: Dynamic Memory
+
+1. Core Concept
+- Stack memory: compiler decides at compile time
+- Heap memory: you ask at runtime with new
+- Use new when size is unknown until program runs
+- Must free with delete to avoid memory leaks
+
+2. How to Apply
+- new int: allocates one integer
+- new int(50): allocates and initializes to 50
+- new string[5]: allocates array of 5 strings
+- delete ptr: frees single variable
+- delete[] arr: frees array
+- Set to nullptr after deleting
+
+3. Task Examples
+- Create dynamic weapon: new string("Excalibur")
+- Create dynamic inventory: new string[10]
+- Always delete after use

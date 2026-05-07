@@ -222,7 +222,32 @@ int main()
 			}
 			break;
 		case DUNGEON:
+		{
 			dungeon.displayMap();
+
+			std::vector<Node *> path = dungeon.findPath(player->tileX, player->tileY, 3, 3);
+			// Test A* pathfinding
+			if (path.empty())
+			{
+				std::cout << "No path found!\n";
+			}
+			else
+			{
+				std::cout << "Path length: " << path.size() << "\n";
+				std::cout << "Path: ";
+				for (Node *n : path)
+				{
+					std::cout << "(" << n->x << "," << n->y << ") ";
+				}
+				std::cout << "\n";
+
+				// Clean up path nodes
+				for (Node *n : path)
+				{
+					delete n;
+				}
+			}
+
 			std::cout << "Position: (" << player->tileX << ", " << player->tileY << ")\n";
 			std::cout << "Move: ";
 
@@ -241,6 +266,7 @@ int main()
 			}
 			dungeon.movePlayer(cmd);
 			break;
+		}
 			// std::cout << std::endl
 			// 		  << "You enter the dungeon" << std::endl;
 			// showDungeonMenu();

@@ -1,0 +1,7 @@
+{
+    "hp": 12,
+    "level": 1,
+    "mp": 10,
+    "name": "Bob",
+    "xpNeeded": 80
+}

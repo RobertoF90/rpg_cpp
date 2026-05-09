@@ -7,6 +7,8 @@
 #include <vector>
 #include "player.h"
 
+class Dungeon;
+
 struct Node
 {
     int x, y;
@@ -22,9 +24,91 @@ struct Node
     }
 };
 
+struct Trigger
+{
+    bool triggered;
+    bool repeatable;
+
+    Trigger() : triggered(false), repeatable(true) {};
+    virtual ~Trigger() = default;
+
+    virtual void onEnter(Dungeon *dungeon) {}
+    virtual void onStay(Dungeon *dungeon) {}
+    virtual void onExit(Dungeon *dungeon) {}
+};
+
+struct MessageTrigger : public Trigger
+{
+    std::string message;
+
+    MessageTrigger(const std::string &msg) : message(msg) {}
+
+    void onEnter(Dungeon *dungeon) override
+    {
+        std::cout << message << "\n";
+        if (!repeatable)
+        {
+            triggered = true;
+        }
+    }
+};
+
+struct Zone
+{
+    int x1, y1, x2, y2; // Rectangle bounds (inclusive)
+    std::vector<Trigger *> triggers;
+
+    // Check if point (x,y) is inside this zone
+    bool contains(int x, int y) const
+    {
+        return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+    }
+
+    // Check and fire triggers for current player position
+    void checkTriggers(int playerX, int playerY, Dungeon *dungeon, bool wasInZone)
+    {
+        bool isInZone = contains(playerX, playerY);
+
+        if (isInZone && !wasInZone)
+        {
+            // Just entered
+            for (Trigger *t : triggers)
+            {
+                if (!t->triggered || t->repeatable)
+                {
+                    t->onEnter(dungeon);
+                }
+            }
+        }
+        else if (isInZone && wasInZone)
+        {
+            // STaying in zone
+            for (Trigger *t : triggers)
+            {
+                if (t->repeatable)
+                {
+                    t->onStay(dungeon);
+                }
+            }
+        }
+        else if (!isInZone && wasInZone)
+        {
+            // Just exited
+            for (Trigger *t : triggers)
+            {
+                t->onExit(dungeon);
+            }
+        }
+    }
+};
+
 class Dungeon
 {
     Player *player;
+
+private:
+    std::vector<Zone> zones;
+    std::vector<bool> zoneStatus;
 
 public:
     struct Tile
@@ -40,6 +124,7 @@ public:
         Player *p) : player(p)
     {
         loadFromFile("map1.txt");
+        initZones();
     }
     enum TileType
     {
@@ -62,6 +147,7 @@ public:
 
     std::vector<Node *> findPath(int startX, int startY, int goalX, int goalY);
     static bool isNodeWalkable(Dungeon *dungeon, int x, int y);
+    void initZones();
 };
 
 #endif

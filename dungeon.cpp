@@ -1,10 +1,15 @@
 #include "dungeon.h"
+#include "raylib.h"
 #include <cstdlib>
 #include <algorithm>
+
 
 void Dungeon::displayMap()
 {
     std::cout << "\n=== MAP ===\n";
+    BeginDrawing();
+    ClearBackground(BLACK);
+    int tileSize = 32;
     for (int y = 0; y < dungeonGrid.size(); y++)
     {
         for (int x = 0; x < dungeonGrid[y].size(); x++)
@@ -12,20 +17,26 @@ void Dungeon::displayMap()
             if (x == player->tileX && y == player->tileY)
             {
                 std::cout << " P ";
+                Color color = BLUE;
+                DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
             }
             else
             {
                 switch (dungeonGrid[y][x].type)
                 {
-                case TILE_WALL:
+                case TILE_WALL:{
                     std::cout << " # ";
-                    break;
+                    Color color = GRAY;
+                    DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
+                    break;}
                 case TILE_WATER:
                     std::cout << " ~ ";
                     break;
-                case TILE_ITEM:
+                case TILE_ITEM:{
                     std::cout << " $ ";
-                    break;
+                    Color color = GOLD;
+                    DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
+                    break;}
                 case TILE_ENEMY:
                     std::cout << " E ";
                     break;
@@ -36,6 +47,7 @@ void Dungeon::displayMap()
             }
         }
         std::cout << "\n";
+        EndDrawing();
     }
 }
 
@@ -81,6 +93,13 @@ bool Dungeon::movePlayer(char direction)
     {
         player->tileX = newX;
         player->tileY = newY;
+
+        for (size_t i = 0; i < zones.size(); i++)
+        {
+            bool wasInZone = (i < zoneStatus.size()) ? zoneStatus[i] : false;
+            zones[i].checkTriggers(player->tileX, player->tileY, this, wasInZone);
+            zoneStatus[i] = zones[i].contains(player->tileX, player->tileY);
+        }
 
         if (dungeonGrid[newY][newX].type == TILE_ITEM)
         {
@@ -264,4 +283,33 @@ std::vector<Node *> Dungeon::findPath(int startX, int startY, int goalX, int goa
         delete n;
     }
     return {};
+}
+
+void Dungeon::initZones()
+{
+
+    // Create Zone 1: Rectangle from (1,1) to (2,2) - "Treasure Room"
+    Zone treasureRoom;
+    treasureRoom.x1 = 1;
+    treasureRoom.y1 = 1;
+    treasureRoom.x2 = 2;
+    treasureRoom.y2 = 2;
+
+    MessageTrigger *msg1 = new MessageTrigger("You entered the treasure room!");
+    treasureRoom.triggers.push_back(msg1);
+    zones.push_back(treasureRoom);
+
+    // Create Zone 2: Single tile (4,4) - "Exit"
+    Zone exitZone;
+    exitZone.x1 = 4;
+    exitZone.y1 = 4;
+    exitZone.x2 = 4;
+    exitZone.y2 = 4;
+
+    MessageTrigger *msg2 = new MessageTrigger("You found the exit!");
+    exitZone.triggers.push_back(msg2);
+    zones.push_back(exitZone);
+
+    // Initialize zoneStatus to track player zone presence
+    zoneStatus.resize(zones.size(), false);
 }

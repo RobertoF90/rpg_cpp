@@ -24,6 +24,8 @@ this is my first game
 #include "level.h"
 #include "dungeon.h"
 
+#include "raylib.h"
+
 float calculateDamage(Player *player, Enemy *enemy)
 {
 	int critRoll = rand() % 100 + 1;
@@ -134,6 +136,8 @@ int getMenuChoice()
 
 int main()
 {
+	InitWindow(800, 600, "RPG");
+	SetTargetFPS(60);
 
 	srand(time(NULL));
 	GameState state = TITLE;

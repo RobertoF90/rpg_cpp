@@ -6,7 +6,16 @@
 
 void Dungeon::displayMap()
 {
-    std::cout << "\n=== MAP ===\n";
+    // std::cout << "\n=== MAP ===\n";
+    if (player->isMoving) {
+        player->moveProgress += player->moveSpeed * GetFrameTime();
+        if (player->moveProgress >= 1.0f){
+            player->moveProgress= 1.0f;
+            player->tileX = player->targetX;
+            player->tileY = player->targetY;
+            player->isMoving = false;
+        }
+    }
     BeginDrawing();
     ClearBackground(BLACK);
     int tileSize = 32;
@@ -14,41 +23,55 @@ void Dungeon::displayMap()
     {
         for (int x = 0; x < dungeonGrid[y].size(); x++)
         {
-            if (x == player->tileX && y == player->tileY)
-            {
-                std::cout << " P ";
-                Color color = BLUE;
-                DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
-            }
-            else
-            {
+            
                 switch (dungeonGrid[y][x].type)
                 {
                 case TILE_WALL:{
-                    std::cout << " # ";
+                    // std::cout << " # ";
                     Color color = GRAY;
                     DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
                     break;}
-                case TILE_WATER:
-                    std::cout << " ~ ";
-                    break;
+                case TILE_WATER:{
+                    Color color = BLUE;
+                    DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
+                    // std::cout << " ~ ";
+                    break;}
                 case TILE_ITEM:{
-                    std::cout << " $ ";
+                    // std::cout << " $ ";
                     Color color = GOLD;
                     DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
                     break;}
-                case TILE_ENEMY:
-                    std::cout << " E ";
-                    break;
-                default:
-                    std::cout << " . ";
+                case TILE_ENEMY:{
+                    // std::cout << " E ";
+                    Color color = RED;
+                    DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
                     break;
                 }
+                default:{
+                    // std::cout << " . ";
+                    Color color = DARKGRAY;
+                    DrawRectangle(x * tileSize + 100, y * tileSize + 100, tileSize, tileSize, color);
+                    break;}
+                }
             }
-        }
-        std::cout << "\n";
-        EndDrawing();
+        
+        // std::cout << "\n";
     }
+    float drawX;
+    float drawY;
+    if (player->isMoving)
+        {
+            drawX = player->startX + (player->targetX - player->startX) * player->moveProgress;
+            drawY = player->startY + (player->targetY - player->startY) * player->moveProgress;
+            // std::cout << " P ";
+                
+        } else  {
+            drawX = player->tileX;
+            drawY = player->tileY;
+        }
+        Color color = GREEN;
+        DrawRectangle(drawX * tileSize + 100, drawY * tileSize + 100, tileSize, tileSize, color);
+    EndDrawing();
 }
 
 bool Dungeon::isWalkable(int tileX, int tileY)
@@ -91,8 +114,12 @@ bool Dungeon::movePlayer(char direction)
 
     if (isWalkable(newX, newY))
     {
-        player->tileX = newX;
-        player->tileY = newY;
+        player->startX = player->tileX;
+        player->startY = player->tileY;
+        player->targetX = newX;
+        player->targetY = newY;
+        player->moveProgress = 0.0f;
+        player->isMoving = true;
 
         for (size_t i = 0; i < zones.size(); i++)
         {

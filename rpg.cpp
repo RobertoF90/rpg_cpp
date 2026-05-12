@@ -82,13 +82,36 @@ enum BattleState
 	BATTLE_END
 };
 
-void showTitleScreen()
+void showTitleScreen(int cursor)
 {
-	std::cout << "=== WELCOME TO THE DUNGEON RPG ===" << std::endl
-			  << std::endl;
-	std::cout << "1. New Game" << std::endl;
-	std::cout << "2. Load Game" << std::endl;
-	std::cout << "3. Quit Game" << std::endl;
+	BeginDrawing();
+	ClearBackground(BLACK);
+	DrawText("DUNGEON RPG", 100, 100, 24, WHITE);
+	if (cursor == 0)
+	{
+		DrawText("->New Game", 100, 160, 20, LIGHTGRAY);
+	}
+	else
+	{
+		DrawText("New Game", 100, 160, 20, LIGHTGRAY);
+	}
+	if (cursor == 1)
+	{
+		DrawText("->Load Game", 100, 190, 20, LIGHTGRAY);
+	}
+	else
+	{
+		DrawText("Load Game", 100, 190, 20, LIGHTGRAY);
+	}
+	if (cursor == 2)
+	{
+		DrawText("->Quit Game", 100, 220, 20, LIGHTGRAY);
+	}
+	else
+	{
+		DrawText("Quit Game", 100, 220, 20, LIGHTGRAY);
+	}
+	EndDrawing();
 }
 
 void showMainMenu()
@@ -129,9 +152,19 @@ void showInventoryMenu()
 
 int getMenuChoice()
 {
-	int choice = 0;
-	std::cin >> choice;
-	return choice;
+	bool choice = false;
+	int cursor = 0;
+	while (!choice)
+	{
+		if (IsKeyPressed(KEY_W))
+			cursor == 0 ? cursor = 2 : cursor -= 1;
+		if (IsKeyPressed(KEY_S))
+			cursor == 2 ? cursor = 0 : cursor += 1;
+		if (IsKeyPressed(KEY_ENTER))
+			choice = true;
+		showTitleScreen(cursor);
+	}
+	return cursor;
 }
 
 int main()
@@ -166,7 +199,8 @@ int main()
 
 	Dungeon dungeon(player);
 
-	dungeon.displayMap();
+	// dungeon.displayMap();
+	showTitleScreen(0);
 
 	int enemyN = rand() % enemies.size();
 	Enemy *enemy = new Enemy("Sword", 20);
@@ -176,31 +210,31 @@ int main()
 	enemy->setStrength(enemy->level * 3.0f);
 	enemy->setDefense(enemy->level * 1.0f);
 
-	while (gameRunning)
+	while (gameRunning && !WindowShouldClose())
 	{
 		switch (state)
 		{
 		case TITLE:
-			showTitleScreen();
+			// showTitleScreen();
 			switch (getMenuChoice())
 			{
-			case 1:
+			case 0:
 				std::cout << "Starting a new game..." << std::endl;
 				player->setName();
 				state = MAIN_MENU;
 				break;
-			case 2:
+			case 1:
 				std::cout << "Loading game..." << std::endl;
 				Data::loadGame(player);
 				player->initializeClass(); // placeholder to distribute stats based on level
 				state = MAIN_MENU;
 				break;
-			case 3:
+			case 2:
 				gameRunning = false;
 				break;
 			default:
-				std::cout << "Starting a new game..." << std::endl;
-				state = MAIN_MENU;
+				// std::cout << "Starting a new game..." << std::endl;
+				// state = MAIN_MENU;
 				break;
 			}
 			break;
@@ -229,46 +263,73 @@ int main()
 		{
 			dungeon.displayMap();
 
-			std::vector<Node *> path = dungeon.findPath(player->tileX, player->tileY, 3, 3);
-			// Test A* pathfinding
-			if (path.empty())
-			{
-				std::cout << "No path found!\n";
-			}
-			else
-			{
-				std::cout << "Path length: " << path.size() << "\n";
-				std::cout << "Path: ";
-				for (Node *n : path)
-				{
-					std::cout << "(" << n->x << "," << n->y << ") ";
-				}
-				std::cout << "\n";
+			// std::vector<Node *> path = dungeon.findPath(player->tileX, player->tileY, 3, 3);
+			// // Test A* pathfinding
+			// if (path.empty())
+			// {
+			// 	std::cout << "No path found!\n";
+			// }
+			// else
+			// {
+			// 	std::cout << "Path length: " << path.size() << "\n";
+			// 	std::cout << "Path: ";
+			// 	for (Node *n : path)
+			// 	{
+			// 		std::cout << "(" << n->x << "," << n->y << ") ";
+			// 	}
+			// 	std::cout << "\n";
 
-				// Clean up path nodes
-				for (Node *n : path)
-				{
-					delete n;
-				}
-			}
+			// 	// Clean up path nodes
+			// 	for (Node *n : path)
+			// 	{
+			// 		delete n;
+			// 	}
+			// }
 
-			std::cout << "Position: (" << player->tileX << ", " << player->tileY << ")\n";
-			std::cout << "Move: ";
+			// std::cout << "Position: (" << player->tileX << ", " << player->tileY << ")\n";
+			// std::cout << "Move: ";
 
-			char cmd;
+			// char cmd;
 
-			if (!(std::cin >> cmd))
+			// if (!(std::cin >> cmd))
+			// {
+			// 	std::cin.clear();
+			// 	std::cin.ignore(10000, '\n');
+			// 	break;
+			// }
+			// if (cmd == 'Q' || cmd == 'q')
+			// {
+			// 	state = MAIN_MENU;
+			// 	break;
+			// }
+
+			// char cmd;
+			// auto key = 0;
+			// if (!GetKeyPressed()) {
+			// 	std::cin >> cmd;
+			// 	std::cout << cmd << std::endl;
+			// 	key = GetKeyPressed();
+
+			// 	std::cout << "key: " << key << std::endl;
+			// } else{
+			// 	std::cout << key << std::endl;
+			// }
+
+			if (!player->isMoving)
 			{
-				std::cin.clear();
-				std::cin.ignore(10000, '\n');
-				break;
+				if (IsKeyPressed(KEY_W))
+					dungeon.movePlayer('N');
+				if (IsKeyPressed(KEY_A))
+					dungeon.movePlayer('W');
+				if (IsKeyPressed(KEY_S))
+					dungeon.movePlayer('S');
+				if (IsKeyPressed(KEY_D))
+					dungeon.movePlayer('E');
+				if (IsKeyPressed(KEY_Q))
+					state = MAIN_MENU;
 			}
-			if (cmd == 'Q' || cmd == 'q')
-			{
-				state = MAIN_MENU;
-				break;
-			}
-			dungeon.movePlayer(cmd);
+
+			// dungeon.movePlayer();
 			break;
 		}
 			// std::cout << std::endl
@@ -467,5 +528,6 @@ int main()
 
 	delete player;
 	delete enemy;
+	CloseWindow();
 	return 0;
 }

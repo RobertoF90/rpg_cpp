@@ -23,6 +23,8 @@ public:
 
         this->tileX = tileX;
         this->tileY = tileY;
+
+        
     };
 
     std::string name;
@@ -30,6 +32,14 @@ public:
 
     int tileX;
     int tileY;
+
+    float moveProgress = 0.0f;
+    float startX = 0.0f; 
+    float startY = 0.0f;
+    float targetX = 0.0f;
+    float targetY = 0.0f;
+    bool isMoving = false;
+    float moveSpeed = 4.0f;
 
     float strength;
     float defense;

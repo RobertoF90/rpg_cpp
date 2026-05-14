@@ -23,6 +23,8 @@ this is my first game
 #include "data.h"
 #include "level.h"
 #include "dungeon.h"
+#include "menu.h"
+#include "titleScreen.h"
 
 #include "raylib.h"
 
@@ -82,49 +84,6 @@ enum BattleState
 	BATTLE_END
 };
 
-void showTitleScreen(int cursor)
-{
-	BeginDrawing();
-	ClearBackground(BLACK);
-	DrawText("DUNGEON RPG", 100, 100, 24, WHITE);
-	if (cursor == 0)
-	{
-		DrawText("->New Game", 100, 160, 20, LIGHTGRAY);
-	}
-	else
-	{
-		DrawText("New Game", 100, 160, 20, LIGHTGRAY);
-	}
-	if (cursor == 1)
-	{
-		DrawText("->Load Game", 100, 190, 20, LIGHTGRAY);
-	}
-	else
-	{
-		DrawText("Load Game", 100, 190, 20, LIGHTGRAY);
-	}
-	if (cursor == 2)
-	{
-		DrawText("->Quit Game", 100, 220, 20, LIGHTGRAY);
-	}
-	else
-	{
-		DrawText("Quit Game", 100, 220, 20, LIGHTGRAY);
-	}
-	EndDrawing();
-}
-
-void showMainMenu()
-{
-	std::cout << "=== CHOOSE AN OPTION ===" << std::endl
-			  << std::endl;
-	std::cout << "1. View Character" << std::endl;
-	std::cout << "2. View Inventory" << std::endl;
-	std::cout << "3. Equip Weapon" << std::endl;
-	std::cout << "4. Enter Dungeon" << std::endl;
-	std::cout << "5. Return to title" << std::endl;
-}
-
 void showDungeonMenu()
 {
 	std::cout << "=== CHOOSE AN OPTION ===" << std::endl
@@ -148,23 +107,6 @@ void showInventoryMenu()
 {
 	std::cout << "1. use potion" << std::endl;
 	std::cout << "2. close" << std::endl;
-}
-
-int getMenuChoice()
-{
-	bool choice = false;
-	int cursor = 0;
-	while (!choice)
-	{
-		if (IsKeyPressed(KEY_W))
-			cursor == 0 ? cursor = 2 : cursor -= 1;
-		if (IsKeyPressed(KEY_S))
-			cursor == 2 ? cursor = 0 : cursor += 1;
-		if (IsKeyPressed(KEY_ENTER))
-			choice = true;
-		showTitleScreen(cursor);
-	}
-	return cursor;
 }
 
 int main()
@@ -200,7 +142,6 @@ int main()
 	Dungeon dungeon(player);
 
 	// dungeon.displayMap();
-	showTitleScreen(0);
 
 	int enemyN = rand() % enemies.size();
 	Enemy *enemy = new Enemy("Sword", 20);
@@ -210,52 +151,89 @@ int main()
 	enemy->setStrength(enemy->level * 3.0f);
 	enemy->setDefense(enemy->level * 1.0f);
 
+	Menu menu = Menu();
+	// TitleScreen titleScreen = TitleScreen();
+
+	// titleScreen.showTitleScreen();
 	while (gameRunning && !WindowShouldClose())
 	{
 		switch (state)
 		{
 		case TITLE:
-			// showTitleScreen();
-			switch (getMenuChoice())
+			menu.showTitleScreen();
+
+			switch (menu.choice)
 			{
-			case 0:
-				std::cout << "Starting a new game..." << std::endl;
-				player->setName();
-				state = MAIN_MENU;
-				break;
+			// std::cout << menu.choice << std::endl;
 			case 1:
+				std::cout << "Starting a new game..." << std::endl;
+				// player->setName();
+				state = MAIN_MENU;
+				menu.resetMenu();
+
+				break;
+			case 2:
 				std::cout << "Loading game..." << std::endl;
 				Data::loadGame(player);
 				player->initializeClass(); // placeholder to distribute stats based on level
 				state = MAIN_MENU;
+				menu.resetMenu();
+
 				break;
-			case 2:
+			case 3:
 				gameRunning = false;
 				break;
-			default:
-				// std::cout << "Starting a new game..." << std::endl;
-				// state = MAIN_MENU;
-				break;
 			}
+			// switch (titleScreen.getMenuChoice(3))
+			// {
+			// case 0:
+			// 	std::cout << "Starting a new game..." << std::endl;
+			// 	player->setName();
+			// 	state = MAIN_MENU;
+			// 	break;
+			// case 1:
+			// 	std::cout << "Loading game..." << std::endl;
+			// 	Data::loadGame(player);
+			// 	player->initializeClass(); // placeholder to distribute stats based on level
+			// 	state = MAIN_MENU;
+			// 	break;
+			// case 2:
+			// 	gameRunning = false;
+			// 	break;
+			// default:
+			// 	// std::cout << "Starting a new game..." << std::endl;
+			// 	// state = MAIN_MENU;
+			// 	break;
+			// }
 			break;
 		case MAIN_MENU:
-			showMainMenu();
-			switch (getMenuChoice())
+			menu.showMainMenu();
+			switch (menu.choice)
 			{
 			case 1:
 				player->viewCharacter();
+				menu.resetMenu();
+
 				break;
 			case 2:
 				player->inventory.viewInventory();
+				menu.resetMenu();
+
 				break;
 			case 3:
 				player->weapon.equipWeapon();
+				menu.resetMenu();
+
 				break;
 			case 4:
 				state = DUNGEON;
+				menu.resetMenu();
+
 				break;
 			case 5:
 				state = TITLE;
+				menu.resetMenu();
+
 				break;
 			}
 			break;
@@ -402,128 +380,128 @@ int main()
 				}
 				player->checkHp();
 				showBattleMenu();
-				switch (getMenuChoice())
-				{
-				case 1:
-					std::cout << std::endl
-							  << "=== BATTLE ===" << std::endl;
-					player->attack(*enemy);
-					damage = calculateDamage(player, enemy);
-					std::cout << player->weapon.weaponEffect << std::endl;
-					std::cout << "Damage dealt: " << damage << std::endl;
-					enemy->takeDamage(damage);
-					if (enemy->getHp() <= 0)
-					{
-						battleState = BATTLE_END;
-					}
-					else
-					{
-						battleState = ENEMY_TURN;
-					}
-					break;
-				case 2:
-					if (player->inventory.getItem("potion"))
-					{
-						player->inventory.removeItem("potion");
-						std::cout << "You have " << player->inventory.getItem("potion") << " left" << std::endl;
-						player->healDamage(20);
-					}
-					else
-					{
-						std::cout << std::endl
-								  << "You have no potions left" << std::endl;
-						round--;
-						break;
-					}
-					break;
-				case 3:
-					std::cout << player->name << " flees the battle!" << std::endl;
-					state = DUNGEON;
-					break;
-				case 4:
-					previousState = BATTLE;
-					previousBattleState = battleState;
-					state = PAUSE;
-					break;
-				}
-				break;
-			case ENEMY_TURN:
-				if (enemy->getHp() > 0)
-				{
-					enemy->attack(*player);
-					if (player->getHp() <= 0)
-					{
-						battleState = BATTLE_END;
-						break;
-					}
-					else
-					{
+				// switch (menu.getMenuChoice(3))
+				// {
+				// 		case 1:
+				// 			std::cout << std::endl
+				// 					  << "=== BATTLE ===" << std::endl;
+				// 			player->attack(*enemy);
+				// 			damage = calculateDamage(player, enemy);
+				// 			std::cout << player->weapon.weaponEffect << std::endl;
+				// 			std::cout << "Damage dealt: " << damage << std::endl;
+				// 			enemy->takeDamage(damage);
+				// 			if (enemy->getHp() <= 0)
+				// 			{
+				// 				battleState = BATTLE_END;
+				// 			}
+				// 			else
+				// 			{
+				// 				battleState = ENEMY_TURN;
+				// 			}
+				// 			break;
+				// 		case 2:
+				// 			if (player->inventory.getItem("potion"))
+				// 			{
+				// 				player->inventory.removeItem("potion");
+				// 				std::cout << "You have " << player->inventory.getItem("potion") << " left" << std::endl;
+				// 				player->healDamage(20);
+				// 			}
+				// 			else
+				// 			{
+				// 				std::cout << std::endl
+				// 						  << "You have no potions left" << std::endl;
+				// 				round--;
+				// 				break;
+				// 			}
+				// 			break;
+				// 		case 3:
+				// 			std::cout << player->name << " flees the battle!" << std::endl;
+				// 			state = DUNGEON;
+				// 			break;
+				// 		case 4:
+				// 			previousState = BATTLE;
+				// 			previousBattleState = battleState;
+				// 			state = PAUSE;
+				// 			break;
+				// 		}
+				// 		break;
+				// 	case ENEMY_TURN:
+				// 		if (enemy->getHp() > 0)
+				// 		{
+				// 			enemy->attack(*player);
+				// 			if (player->getHp() <= 0)
+				// 			{
+				// 				battleState = BATTLE_END;
+				// 				break;
+				// 			}
+				// 			else
+				// 			{
 
-						battleState = PLAYER_TURN;
-					}
-				}
+				// 				battleState = PLAYER_TURN;
+				// 			}
+				// 		}
+				// 		break;
+				// 	default:
+				// 		break;
+				// 	}
+				// 	break;
+				// case GAME_OVER:
+				// 	std::cout << "GAME OVER" << std::endl;
+				// 	gameRunning = false;
+				// 	break;
+
+				// case PAUSE:
+				// 	std::cout << "\n=== PAUSED ===" << std::endl;
+				// 	std::cout << "1. Resume" << std::endl;
+				// 	std::cout << "2. Save Game" << std::endl;
+				// 	std::cout << "3. Quit to Title" << std::endl;
+
+				// 	switch (menu.getMenuChoice(2))
+				// 	{
+				// 	case 1:
+				// 		state = previousState;
+				// 		battleState = previousBattleState;
+				// 		break;
+
+				// 	case 2:
+				// 		Data::saveGame(player);
+				// 		break;
+				// 	case 3:
+				// 		state = TITLE;
+				// 		break;
+				// 	}
 				break;
-			default:
-				break;
+			case INVENTORY:
+				player->inventory.viewInventory();
+				showInventoryMenu();
+				// 	switch (menu.getMenuChoice(2))
+				// 	{
+				// 	case 1:
+				// 		if (player->inventory.getItem("potion"))
+				// 		{
+				// 			player->inventory.removeItem("potion");
+				// 			std::cout << "You have " << player->inventory.getItem("potion") << " left" << std::endl;
+				// 			player->healDamage(20);
+				// 		}
+				// 		else
+				// 		{
+				// 			std::cout << std::endl
+				// 					  << "You have no potions left" << std::endl;
+				// 			round--;
+				// 			break;
+				// 		}
+				// 		break;
+				// 	case 2:
+				// 		state = DUNGEON;
+				// 		break;
+				// 	}
+				// 	break;
+
+				// default:
+				// 	break;
 			}
-			break;
-		case GAME_OVER:
-			std::cout << "GAME OVER" << std::endl;
-			gameRunning = false;
-			break;
-
-		case PAUSE:
-			std::cout << "\n=== PAUSED ===" << std::endl;
-			std::cout << "1. Resume" << std::endl;
-			std::cout << "2. Save Game" << std::endl;
-			std::cout << "3. Quit to Title" << std::endl;
-
-			switch (getMenuChoice())
-			{
-			case 1:
-				state = previousState;
-				battleState = previousBattleState;
-				break;
-
-			case 2:
-				Data::saveGame(player);
-				break;
-			case 3:
-				state = TITLE;
-				break;
-			}
-			break;
-		case INVENTORY:
-			player->inventory.viewInventory();
-			showInventoryMenu();
-			switch (getMenuChoice())
-			{
-			case 1:
-				if (player->inventory.getItem("potion"))
-				{
-					player->inventory.removeItem("potion");
-					std::cout << "You have " << player->inventory.getItem("potion") << " left" << std::endl;
-					player->healDamage(20);
-				}
-				else
-				{
-					std::cout << std::endl
-							  << "You have no potions left" << std::endl;
-					round--;
-					break;
-				}
-				break;
-			case 2:
-				state = DUNGEON;
-				break;
-			}
-			break;
-
-		default:
-			break;
 		}
 	}
-
 	// std::cout << player->weaponDamage["Sword"] << std::endl;
 
 	delete player;

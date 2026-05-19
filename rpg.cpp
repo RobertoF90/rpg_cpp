@@ -1,7 +1,4 @@
-/*
-this is my first game
-13/04/2026
-*/
+// 13/04/2026
 
 #include <iostream>
 #include <string>
@@ -109,9 +106,12 @@ void showInventoryMenu()
 	std::cout << "2. close" << std::endl;
 }
 
+const int screenWidth = 800;
+const int screenHeight = 600;
+
 int main()
 {
-	InitWindow(800, 600, "RPG");
+	InitWindow(screenWidth, screenHeight, "RPG");
 	SetTargetFPS(60);
 
 	srand(time(NULL));
@@ -152,6 +152,9 @@ int main()
 	enemy->setDefense(enemy->level * 1.0f);
 
 	Menu menu = Menu();
+
+	Texture2D texture = LoadTexture("player.png");
+
 	// TitleScreen titleScreen = TitleScreen();
 
 	// titleScreen.showTitleScreen();
@@ -161,50 +164,25 @@ int main()
 		{
 		case TITLE:
 			menu.showTitleScreen();
+			DrawTexture(texture, screenWidth / 2, screenHeight / 2, WHITE);
 
 			switch (menu.choice)
 			{
-			// std::cout << menu.choice << std::endl;
 			case 1:
 				std::cout << "Starting a new game..." << std::endl;
 				// player->setName();
 				state = MAIN_MENU;
-				menu.resetMenu();
-
 				break;
 			case 2:
 				std::cout << "Loading game..." << std::endl;
 				Data::loadGame(player);
 				player->initializeClass(); // placeholder to distribute stats based on level
 				state = MAIN_MENU;
-				menu.resetMenu();
-
 				break;
 			case 3:
 				gameRunning = false;
 				break;
 			}
-			// switch (titleScreen.getMenuChoice(3))
-			// {
-			// case 0:
-			// 	std::cout << "Starting a new game..." << std::endl;
-			// 	player->setName();
-			// 	state = MAIN_MENU;
-			// 	break;
-			// case 1:
-			// 	std::cout << "Loading game..." << std::endl;
-			// 	Data::loadGame(player);
-			// 	player->initializeClass(); // placeholder to distribute stats based on level
-			// 	state = MAIN_MENU;
-			// 	break;
-			// case 2:
-			// 	gameRunning = false;
-			// 	break;
-			// default:
-			// 	// std::cout << "Starting a new game..." << std::endl;
-			// 	// state = MAIN_MENU;
-			// 	break;
-			// }
 			break;
 		case MAIN_MENU:
 			menu.showMainMenu();
@@ -212,28 +190,18 @@ int main()
 			{
 			case 1:
 				player->viewCharacter();
-				menu.resetMenu();
-
 				break;
 			case 2:
 				player->inventory.viewInventory();
-				menu.resetMenu();
-
 				break;
 			case 3:
 				player->weapon.equipWeapon();
-				menu.resetMenu();
-
 				break;
 			case 4:
 				state = DUNGEON;
-				menu.resetMenu();
-
 				break;
 			case 5:
 				state = TITLE;
-				menu.resetMenu();
-
 				break;
 			}
 			break;

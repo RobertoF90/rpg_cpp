@@ -14,6 +14,12 @@
 
 void Menu::getMenuChoice(int options)
 {
+
+    if (choice)
+    {
+        resetMenu();
+    }
+
     if (!choice)
     {
         if (IsKeyPressed(KEY_W))
@@ -29,33 +35,21 @@ void Menu::showTitleScreen()
 {
     getMenuChoice(3);
 
-    BeginDrawing();
+    int x = GetScreenWidth() / 4;
+    int y = GetScreenHeight() / 2 + GetScreenHeight() / 4;
+    int w = 120;
+    int h = 24;
+
     ClearBackground(BLACK);
-    DrawText("DUNGEON RPG", 100, 100, 24, WHITE);
-    if (cursor == 0)
-    {
-        DrawText("->New Game", 100, 160, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("New Game", 100, 160, 20, LIGHTGRAY);
-    }
-    if (cursor == 1)
-    {
-        DrawText("->Load Game", 100, 190, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("Load Game", 100, 190, 20, LIGHTGRAY);
-    }
-    if (cursor == 2)
-    {
-        DrawText("->Quit Game", 100, 220, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("Quit Game", 100, 220, 20, LIGHTGRAY);
-    }
+    BeginDrawing();
+    DrawText("DUNGEON RPG", x - w, y - GetScreenHeight() / 2, 48, WHITE);
+
+    DrawText("New Game", x - w, y, 20, LIGHTGRAY);
+    DrawText("Load Game", x - w, y + 32, 20, LIGHTGRAY);
+    DrawText("Quit Game", x - w, y + 64, 20, LIGHTGRAY);
+
+    DrawRectangleLines(x - w - 8, y - 2 + (32 * cursor), w, h, ORANGE);
+
     EndDrawing();
 }
 
@@ -63,56 +57,28 @@ void Menu::showMainMenu()
 {
     getMenuChoice(5);
 
-    BeginDrawing();
+    int x = GetScreenWidth() / 2;
+    int y = GetScreenHeight() / 4;
+    int w = 196;
+    int h = 24;
+
     ClearBackground(BLACK);
-    DrawText("Main Menu", 100, 100, 24, WHITE);
-    if (cursor == 0)
-    {
-        DrawText("->View Character", 100, 160, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("View Character", 100, 160, 20, LIGHTGRAY);
-    }
-    if (cursor == 1)
-    {
-        DrawText("->View Inventory", 100, 190, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("View Inventory", 100, 190, 20, LIGHTGRAY);
-    }
-    if (cursor == 2)
-    {
-        DrawText("->Equip Weapon", 100, 220, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("Equip Weapon", 100, 220, 20, LIGHTGRAY);
-    }
-    if (cursor == 3)
-    {
-        DrawText("->Enter Dungeon", 100, 250, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("Enter Dungeon", 100, 250, 20, LIGHTGRAY);
-    }
-    if (cursor == 4)
-    {
-        DrawText("->Return to title", 100, 280, 20, LIGHTGRAY);
-    }
-    else
-    {
-        DrawText("Return to title", 100, 280, 20, LIGHTGRAY);
-    }
+    BeginDrawing();
+
+    DrawText("Main Menu", x - w, y - 64, h, WHITE);
+    DrawText("View Character", x - w, y, 20, LIGHTGRAY);
+    DrawText("View Inventory", x - w, y + 32, 20, LIGHTGRAY);
+    DrawText("Equip Weapon", x - w, y + 64, 20, LIGHTGRAY);
+    DrawText("Enter Dungeon", x - w, y + 96, 20, LIGHTGRAY);
+    DrawText("Return to title", x - w, y + 128, 20, LIGHTGRAY);
+
+    DrawRectangleLines(x - w - 8, y - 2 + (32 * cursor), w, h, ORANGE);
 
     EndDrawing();
 }
 
 void Menu::resetMenu()
 {
-    std::cout << "resetting menu" << std::endl;
     choice = 0;
     cursor = 0;
 }

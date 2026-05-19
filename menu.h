@@ -7,6 +7,16 @@ class Menu
 {
 
 public:
+    //  Menu(
+
+    //         std::string weakTo = "Sword",
+    //         int xpReward = 5)
+    //         : Character()
+    //     {
+    //         this->weakTo = weakTo;
+    //         this->xpReward = xpReward;
+    //     };
+
     int choice = 0;
     int cursor = 0;
 
